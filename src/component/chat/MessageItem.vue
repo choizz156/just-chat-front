@@ -1,10 +1,5 @@
 <script setup lang="ts">
-defineProps({
-  message: {
-    type: Object,
-    required: true,
-  },
-});
+
 </script>
 
 <template>

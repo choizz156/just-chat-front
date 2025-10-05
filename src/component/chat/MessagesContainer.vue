@@ -1,12 +1,5 @@
 <script setup lang="ts">
-import MessageItem from './MessageItem.vue';
 
-defineProps({
-  messages: {
-    type: Array,
-    required: true,
-  },
-});
 </script>
 
 <template>

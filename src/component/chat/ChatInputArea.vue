@@ -1,13 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
 
-const text = ref('');
-const emit = defineEmits(['send']);
-
-const handleSend = () => {
-  emit('send', text.value);
-  text.value = '';
-};
 </script>
 
 <template>

@@ -1,16 +1,11 @@
 <script setup lang="ts">
-import ChatArea from '@/component/ChatArea.vue'
+import { RouterLink, RouterView } from 'vue-router'
 </script>
 
 <template>
-  <h1>You did it!</h1>
-  <p>
-    Visit <a href="https://vuejs.org/" target="_blank" rel="noopener">vuejs.org</a> to read the
-    documentation
-  </p>
-  <ChatArea>
-
-  </ChatArea>
+  <RouterLink to="/">Home</RouterLink>
+  <RouterLink to="/join">회원가입</RouterLink>
+  <RouterView />
 </template>
 
 <style scoped></style>
