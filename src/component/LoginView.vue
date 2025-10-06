@@ -42,6 +42,7 @@ import { ElMessage } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
 import router from '@/router'
 import axios from 'axios'
+import { methods, UserStore } from '@/store/user.ts'
 
 const loginFormRef = ref<FormInstance>()
 const loading = ref(false)
@@ -70,7 +71,7 @@ const handleLogin = async () => {
       loading.value = true
 
       try {
-        await axios.post(
+        const res = await axios.post(
           'http://localhost:8080/auth/login',
           {
             username: loginForm.username,
@@ -78,18 +79,25 @@ const handleLogin = async () => {
           },
           { withCredentials: true },
         )
-        loading.value = false
         ElMessage.success('로그인 성공!')
-        router.push('/chatting')
+        storeUserInfo(res.data.result)
+        await router.push('/chatting')
       } catch (error: any) {
+        console.error(error.message)
         const errorMessage = '로그인에 실패했습니다.'
         ElMessage.error(errorMessage)
+      } finally {
+        loading.value = false
       }
     }
   })
 }
 
-// 회원가입 페이지로 이동
+function storeUserInfo(data: any) {
+  const userInfo = new UserStore(data.id, data.nickname, data.email, data.profileImage)
+  methods.setUserInfo(userInfo)
+}
+
 const handleGoToJoin = () => {
   ElMessage.info('회원가입 페이지로 이동')
   router.push('/join')
