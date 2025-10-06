@@ -6,8 +6,8 @@
       </template>
 
       <el-form ref="loginFormRef" :model="loginForm" :rules="rules" label-width="0" size="large">
-        <el-form-item prop="email">
-          <el-input v-model="loginForm.email" placeholder="e-mail" prefix-icon="User" />
+        <el-form-item prop="username">
+          <el-input v-model="loginForm.username" placeholder="e-mail" prefix-icon="User" />
         </el-form-item>
 
         <el-form-item prop="password">
@@ -41,19 +41,18 @@ import { ref, reactive } from 'vue'
 import { ElMessage } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
 import router from '@/router'
+import axios from 'axios'
 
 const loginFormRef = ref<FormInstance>()
 const loading = ref(false)
 
-// 로그인 폼 데이터
 const loginForm = reactive({
-  email: '',
+  username: '',
   password: '',
 })
 
-// 유효성 검사 규칙
 const rules = reactive<FormRules>({
-  email: [
+  username: [
     { required: true, message: '이메일을 입력해주세요', trigger: 'blur' },
     { type: 'email', message: '올바른 이메일 형식이 아닙니다', trigger: 'blur' },
   ],
@@ -63,20 +62,29 @@ const rules = reactive<FormRules>({
   ],
 })
 
-// 로그인 처리
 const handleLogin = async () => {
   if (!loginFormRef.value) return
 
-  await loginFormRef.value.validate((valid) => {
+  await loginFormRef.value.validate(async (valid) => {
     if (valid) {
       loading.value = true
 
-      // TODO: 실제 로그인 API 호출
-      setTimeout(() => {
+      try {
+        await axios.post(
+          'http://localhost:8080/auth/login',
+          {
+            username: loginForm.username,
+            password: loginForm.password,
+          },
+          { withCredentials: true },
+        )
         loading.value = false
         ElMessage.success('로그인 성공!')
-        // router.push('/')
-      }, 1000)
+        router.push('/chatting')
+      } catch (error: any) {
+        const errorMessage = '로그인에 실패했습니다.'
+        ElMessage.error(errorMessage)
+      }
     }
   })
 }

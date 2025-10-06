@@ -57,14 +57,17 @@ const ruleForm = reactive({
   username: '',
   pass: '',
   checkPass: '',
-  nickname: ''
+  nickname: '',
 })
 
 const rules = reactive<FormRules<typeof ruleForm>>({
-  username: [{ validator: validateEmail, required: true, trigger: 'blur' }],
+  username: [
+    { type: 'email', message: '올바른 이메일 형식이 아닙니다', trigger: 'blur' },
+    { validator: validateEmail, required: true, trigger: 'blur' },
+  ],
   pass: [{ validator: validatePass, trigger: 'blur' }],
   checkPass: [{ validator: validatePass2, trigger: 'blur' }],
-  nickname: [{ validator: validateNickname, trigger: 'blur' }]
+  nickname: [{ validator: validateNickname, trigger: 'blur' }],
 })
 
 const submitForm = async (formEl: FormInstance | undefined) => {
@@ -72,16 +75,16 @@ const submitForm = async (formEl: FormInstance | undefined) => {
   await formEl.validate(async (valid) => {
     if (valid) {
       try {
-
         await axios.post('http://localhost:8080/users', {
           email: ruleForm.username,
           password: ruleForm.pass,
-          nickname: ruleForm.nickname
+          nickname: ruleForm.nickname,
         })
         ElMessage.success('회원가입이 완료되었습니다!')
-        await router.push('/login')
+        await router.push('/')
       } catch (error: any) {
-        const errorMessage = error.response?.data?.message || '회원가입에 실패했습니다. 다시 시도해주세요.'
+        const errorMessage =
+          error.response?.data?.message || '회원가입에 실패했습니다. 다시 시도해주세요.'
         ElMessage.error(errorMessage)
       }
     } else {
@@ -120,9 +123,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
           <el-input v-model="ruleForm.nickname" />
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" native-type="submit" class="submit-btn">
-            회원가입
-          </el-button>
+          <el-button type="primary" native-type="submit" class="submit-btn"> 회원가입 </el-button>
         </el-form-item>
       </el-form>
     </el-card>
