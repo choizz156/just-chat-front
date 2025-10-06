@@ -4,15 +4,18 @@ import type { Ref } from 'vue';
 import ChatHeader from './ChatHeader.vue';
 import MessagesContainer from './MessagesContainer.vue';
 import ChatInputArea from './ChatInputArea.vue';
+import Header from '@/component/Header.vue'
 
 
 </script>
 
 <template>
+  <Header></Header>
   <div class="chat-area">
-    <ChatHeader :user="user" />
-    <MessagesContainer :messages="messages" />
-    <ChatInputArea @send="addMessage" />
+
+<!--    <ChatHeader :user="user" />-->
+<!--    <MessagesContainer :messages="messages" />-->
+<!--    <ChatInputArea @send="addMessage" />-->
   </div>
 </template>
 

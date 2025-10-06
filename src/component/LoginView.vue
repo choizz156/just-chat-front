@@ -37,9 +37,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
-import { ElMessage } from 'element-plus'
+import { reactive, ref } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
+import { ElMessage } from 'element-plus'
 import router from '@/router'
 import axios from 'axios'
 import { methods, UserStore } from '@/store/user.ts'
@@ -80,7 +80,7 @@ const handleLogin = async () => {
           { withCredentials: true },
         )
         ElMessage.success('로그인 성공!')
-        storeUserInfo(res.data.result)
+        await storeUserInfo(res.data.result)
         await router.push('/chatting')
       } catch (error: any) {
         console.error(error.message)
@@ -94,8 +94,22 @@ const handleLogin = async () => {
 }
 
 function storeUserInfo(data: any) {
-  const userInfo = new UserStore(data.id, data.nickname, data.email, data.profileImage)
+  const imageUrl = toImageUrl(data.profileImage)
+
+  const userInfo = new UserStore(data.id, data.nickname, data.email, imageUrl)
   methods.setUserInfo(userInfo)
+}
+
+function toImageUrl(image: string): string {
+  if (!image) {
+    return `https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png`
+  }
+
+  const bytesChar = atob(image)
+  const byteNum = new Array(bytesChar.length).fill(0).map((_, i) => bytesChar.charCodeAt(i))
+  const uint8Array = new Uint8Array(byteNum)
+  const blob = new Blob([uint8Array], { type: 'image/jpeg' })
+  return URL.createObjectURL(blob)
 }
 
 const handleGoToJoin = () => {

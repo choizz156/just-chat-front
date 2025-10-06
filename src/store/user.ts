@@ -2,10 +2,10 @@ import { reactive } from 'vue'
 
 export class UserStore {
 
-  private readonly userId: string
-  private readonly nickname: string
-  private readonly email: string
-  private readonly profileImage: string
+   readonly userId: string
+   readonly nickname: string
+   readonly email: string
+   readonly profileImage: string
 
   constructor(userId: string, nickname: string, email: string, profileImage: string) {
     this.userId = userId
@@ -13,23 +13,9 @@ export class UserStore {
     this.email = email
     this.profileImage = profileImage
   }
-
-  getId(): string {
-    return this.userId
-  }
-  getEmail(): string {
-    return this.email
-  }
-  getnickname(): string {
-    return this.nickname
-  }
-
-  getProfileImage(): string {
-    return this.profileImage
-  }
 }
 
-const state = reactive({
+export const state = reactive({
   userInfo: null as UserStore | null
 });
 

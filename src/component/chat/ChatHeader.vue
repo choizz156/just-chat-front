@@ -4,10 +4,10 @@
 
 <template>
   <div class="chat-header">
-    <div class="chat-header-avatar">{{ user.name[0] }}</div>
+    <div class="chat-header-avatar">}</div>
     <div class="chat-header-info">
-      <div class="chat-header-name">{{ user.name }}</div>
-      <div class="chat-header-status">● {{ user.status }}</div>
+      <div class="chat-header-name">}</div>
+      <div class="chat-header-status"></div>
     </div>
   </div>
 </template>

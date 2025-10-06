@@ -1,39 +1,34 @@
 <template>
   <header class="bg-white shadow-sm">
     <div class="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8">
-      <!-- Logo -->
-      <h1 class="text-xl font-bold text-gray-900">MyApp <el-dropdown trigger="click" @command="handleCommand">
-        <div class="flex items-center cursor-pointer hover:opacity-80 transition-opacity">
-          <el-avatar
-            :size="40"
-            :src="userProfile.avatar"
-            class="border-2 border-gray-200"
-          />
-          <span class="text-sm font-semibold text-gray-900 ml-4">{{ userProfile.nickname }}</span>
-          <el-icon class="text-gray-400 ml-2">
-            <arrow-down />
-          </el-icon>
-        </div>
-        <template #dropdown>
-          <el-dropdown-menu>
-            <el-dropdown-item command="profile">
-              <el-icon class="mr-2"><user /></el-icon>
-              프로필
-            </el-dropdown-item>
-            <el-dropdown-item command="settings">
-              <el-icon class="mr-2"><setting /></el-icon>
-              설정
-            </el-dropdown-item>
-            <el-dropdown-item divided command="logout">
-              <el-icon class="mr-2"><switch-button /></el-icon>
-              로그아웃
-            </el-dropdown-item>
-          </el-dropdown-menu>
-        </template>
-      </el-dropdown></h1>
-
-      <!-- User Profile Section -->
-
+      <h1 class="text-xl font-bold text-gray-900">
+        Just Chatting
+        <el-dropdown trigger="click" @command="handleCommand">
+          <div class="flex items-center cursor-pointer hover:opacity-80 transition-opacity">
+            <el-avatar :size="40" :src=userProfile.avatar class="border-2 border-gray-200" />
+            <span class="text-sm font-semibold text-gray-900 ml-4">{{ userProfile.nickname }}</span>
+            <el-icon class="text-gray-400 ml-2">
+              <arrow-down />
+            </el-icon>
+          </div>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item command="profile">
+                <el-icon class="mr-2"><user /></el-icon>
+                프로필
+              </el-dropdown-item>
+              <el-dropdown-item command="settings">
+                <el-icon class="mr-2"><setting /></el-icon>
+                설정
+              </el-dropdown-item>
+              <el-dropdown-item divided command="logout">
+                <el-icon class="mr-2"><switch-button /></el-icon>
+                로그아웃
+              </el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+      </h1>
     </div>
   </header>
 </template>
@@ -42,15 +37,14 @@
 import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import { ArrowDown, User, Setting, SwitchButton } from '@element-plus/icons-vue'
+import { state } from '@/store/user.ts'
 
 // 사용자 프로필 정보
 const userProfile = ref({
-  avatar: 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
-  nickname: '홍길동',
-  email: 'hong@example.com'
+  nickname: state.userInfo?.nickname,
+  avatar: state.userInfo?.profileImage,
 })
 
-// 드롭다운 메뉴 핸들러
 const handleCommand = (command: string) => {
   switch (command) {
     case 'profile':
