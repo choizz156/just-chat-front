@@ -37,7 +37,7 @@
 import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import { ArrowDown, User, Setting, SwitchButton } from '@element-plus/icons-vue'
-import { state } from '@/store/user.ts'
+import { state } from '@/store/userStore.ts'
 
 // 사용자 프로필 정보
 const userProfile = ref({

@@ -42,7 +42,8 @@ import type { FormInstance, FormRules } from 'element-plus'
 import { ElMessage } from 'element-plus'
 import router from '@/router'
 import axios from 'axios'
-import { methods, UserStore } from '@/store/user.ts'
+import { useUserStore } from '@/store/userStore.ts'
+import type { UserInfo } from '@/types/index.ts'
 
 const loginFormRef = ref<FormInstance>()
 const loading = ref(false)
@@ -93,11 +94,17 @@ const handleLogin = async () => {
   })
 }
 
+const { setUserInfo } = useUserStore()
 function storeUserInfo(data: any) {
-  const imageUrl = toImageUrl(data.profileImage)
+  const imageUrl: string = toImageUrl(data.profileImage)
 
-  const userInfo = new UserStore(data.id, data.nickname, data.email, imageUrl)
-  methods.setUserInfo(userInfo)
+  const userInfo: UserInfo = {
+    userId: data.userId,
+    nickname: data.nickname,
+    email: data.email,
+    profileImage: imageUrl,
+  }
+  setUserInfo(userInfo)
 }
 
 function toImageUrl(image: string): string {
