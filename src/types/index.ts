@@ -6,7 +6,7 @@ export type UserInfo = {
 }
 
 export type OnlineUserInfo = {
-  userId: string
+  id: string
   nickname: string
   profileImage: string
 }

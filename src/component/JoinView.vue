@@ -85,19 +85,13 @@ const submitForm = async (formEl: FormInstance | undefined) => {
   await formEl.validate(async (valid) => {
     if (valid) {
       try {
-        const formData = new FormData()
-        formData.append('email', ruleForm.username)
-        formData.append('password', ruleForm.pass)
-        formData.append('nickname', ruleForm.nickname)
-        if (profileImageFile.value) {
-          formData.append('profileImage', profileImageFile.value.raw as Blob)
-        }
-
-        await axios.post('http://localhost:8080/users', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
+        await axios.post('http://localhost:8080/users',{
+          'email' : ruleForm.username,
+          'password': ruleForm.pass,
+          'nickname': ruleForm.nickname,
+          'profileImage' : imageUrl.value
         })
+
         ElMessage.success('회원가입이 완료되었습니다!')
         await router.push('/')
       } catch (error: any) {

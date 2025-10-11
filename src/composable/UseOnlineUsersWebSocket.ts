@@ -1,13 +1,10 @@
 import { ref, watch, onMounted, onUnmounted, type Ref } from 'vue'
 import type { OnlineUserInfo } from '@/types/index.ts'
 
-export interface WebSocketOnlineUsers {
-  onlineUsers: OnlineUserInfo[]
-}
 
 interface UseOnlineUsersWebSocketProps {
   userId: string | undefined
-  onMessage?: (msg: WebSocketOnlineUsers) => void
+  onMessage?: () => void
   onConnect?: () => void
   onDisconnect?: () => void
   onError?: (err: string) => void
@@ -22,7 +19,7 @@ export const useOnlineUsersWebSocket = ({
 }: UseOnlineUsersWebSocketProps) => {
   const ws = ref<WebSocket | null>(null)
   const isConnected = ref(false)
-  const lastMessage = ref<WebSocketOnlineUsers | null>(null)
+  const lastMessage = ref<OnlineUserInfo[] | null>(null)
   const error = ref<string>()
   const reconnectAttempts = ref(0)
   const reconnectTimeoutId = ref<number | undefined>()
@@ -40,6 +37,7 @@ export const useOnlineUsersWebSocket = ({
     }
 
     try {
+  
       const wsUrl = `ws://localhost:8080/ws/online-users`
       ws.value = new WebSocket(wsUrl)
 
@@ -53,9 +51,12 @@ export const useOnlineUsersWebSocket = ({
 
       ws.value.onmessage = (event) => {
         try {
-          const message = JSON.parse(event.data)
+          const message = JSON.parse(event.data) as OnlineUserInfo[]
+          console.log(message);
           lastMessage.value = message
-          onMessage?.(message)
+          console.log(lastMessage.value);
+          
+          onMessage?.()
         } catch {
           error.value = '메시지 파싱 실패'
         }

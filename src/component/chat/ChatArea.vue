@@ -8,28 +8,28 @@
         <el-scrollbar height="180px">
           <div v-for="user in onlineUsers" :key="user.id" class="user-item">
             <div class="avatar">
-              <el-avatar :size="40" :src="user.avatar" class="border-2 border-gray-200" />
-              <div class="status" :class="user.status === 'online' ? 'online' : 'away'"></div>
+              <el-avatar :size="40" :src="user.profileImage" class="border-2 border-gray-200" />
+              <!-- <div class="status" :class="user.status === 'online' ? 'online' : 'away'"></div> -->
             </div>
-            <span>{{ user.name }}</span>
+            <span>{{ user.nickname }}</span>
           </div>
         </el-scrollbar>
       </div>
 
-      <!-- 채팅방 리스트 -->
-      <div class="room-list">
-        <h2><MessageCircle class="icon" /> 채팅방</h2>
+      채팅방 리스트
+      <!-- <div class="room-list">
+        <h2><MessageCircle class="icon" /> 채팅방</h2> -->
 
-        <!-- 🔍 검색창 -->
-        <el-input
+      🔍 검색창
+       <!-- <el-input
           v-model="searchTerm"
           placeholder="채팅방 검색..."
           prefix-icon="Search"
           clearable
           class="mb-3"
-        />
+        /> -->
 
-        <template v-if="filteredRooms.length > 0">
+        <!-- <template v-if="filteredRooms.length > 0">
           <div
             v-for="room in filteredRooms"
             :key="room.id"
@@ -45,18 +45,18 @@
         <template v-else>
           <p class="no-result">검색 결과가 없습니다 😢</p>
         </template>
-      </div>
+      </div> -->
     </div>
 
     <!-- 오른쪽 채팅창 -->
-    <div class="chat-area">
+      <!-- <div class="chat-area">
       <template v-if="selectedRoom">
         <div class="chat-header">
           <h3>{{ chatRooms.find((r) => r.id === selectedRoom)?.name }}</h3>
-        </div>
+        </div> -->
 
-        <!-- 메시지 목록 -->
-        <el-scrollbar class="message-list">
+      <!-- 메시지 목록 -->
+      <!-- <el-scrollbar class="message-list">
           <div v-for="msg in messages" :key="msg.id" class="message" :class="{ me: msg.isMe }">
             <div class="message-box">
               <div v-if="!msg.isMe" class="username">{{ msg.user }}</div>
@@ -66,10 +66,10 @@
               </div>
             </div>
           </div>
-        </el-scrollbar>
+        </el-scrollbar>  -->
 
-        <!-- 입력 영역 -->
-        <div class="input-area">
+      <!-- 입력 영역 -->
+      <!-- <div class="input-area">
           <el-input
             v-model="message"
             placeholder="메시지를 입력하세요..."
@@ -81,51 +81,38 @@
             전송
           </el-button>
         </div>
-      </template>
+      </template>  -->
 
-      <template v-else>
+      <!-- <template v-else>
         <div class="empty">
           <MessageCircle class="empty-icon" />
           <p>채팅방을 선택해주세요</p>
         </div>
       </template>
-    </div>
+    </div>-->
   </div>
 </template>
 
 <script setup lang="ts">
 import { state } from '@/store/userStore.ts'
-import {
-  useOnlineUsersWebSocket,
-  type WebSocketOnlineUsers,
-} from '@/composable/UseOnlineUsersWebSocket.ts'
+import { useOnlineUsersWebSocket } from '@/composable/UseOnlineUsersWebSocket.ts'
 import type { OnlineUserInfo } from '@/types/index.ts'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 
 const userId: string | undefined = state.userInfo!.userId
+const onlineUsers = ref<OnlineUserInfo[] | null>(null)
 
-const onlineUsers = ref<OnlineUserInfo[]>([])
-
-const {
-  isConnected,
-  lastMessage,
-  disconnect,
-  error,
-} = useOnlineUsersWebSocket({
+const { isConnected, lastMessage, disconnect, error } = useOnlineUsersWebSocket({
   userId,
-  onMessage: (msg) => console.log(`${userId}: ${msg.onlineUsers}`),
+  onMessage: () => console.log('메시지 수신'),
   onConnect: () => console.log('온라인 유저 연결 완료'),
   onDisconnect: () => console.log('온라인 유저 소켓 해제'),
-  onError: (error) => console.err(error),
+  onError: (error) => console.error(error),
 })
 
-onlineUsers.value = lastMessage.value
-
-/*
- * 1.로그인 유저 웹소켓 연결
- * 2. 받아서 보여주면 됨
- * 3.
- * */
+watch(lastMessage, (newOnlineUsers) => {
+  onlineUsers.value = newOnlineUsers
+})
 </script>
 
 <style scoped>
