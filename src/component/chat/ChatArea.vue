@@ -6,21 +6,10 @@
       <div class="user-list">
         <h2><User class="icon" /> 온라인 유저</h2>
         <el-scrollbar height="180px">
-          <div
-            v-for="user in onlineUsers"
-            :key="user.id"
-            class="user-item"
-          >
+          <div v-for="user in onlineUsers" :key="user.id" class="user-item">
             <div class="avatar">
-              <el-avatar
-                :size="40"
-                :src="user.avatar"
-                class="border-2 border-gray-200"
-              />
-              <div
-                class="status"
-                :class="user.status === 'online' ? 'online' : 'away'"
-              ></div>
+              <el-avatar :size="40" :src="user.avatar" class="border-2 border-gray-200" />
+              <div class="status" :class="user.status === 'online' ? 'online' : 'away'"></div>
             </div>
             <span>{{ user.name }}</span>
           </div>
@@ -49,11 +38,7 @@
             :class="{ active: selectedRoom === room.id }"
           >
             <span>{{ room.name }}</span>
-            <el-badge
-              v-if="room.unread > 0"
-              :value="room.unread"
-              type="primary"
-            />
+            <el-badge v-if="room.unread > 0" :value="room.unread" type="primary" />
           </div>
         </template>
 
@@ -67,17 +52,12 @@
     <div class="chat-area">
       <template v-if="selectedRoom">
         <div class="chat-header">
-          <h3>{{ chatRooms.find(r => r.id === selectedRoom)?.name }}</h3>
+          <h3>{{ chatRooms.find((r) => r.id === selectedRoom)?.name }}</h3>
         </div>
 
         <!-- 메시지 목록 -->
         <el-scrollbar class="message-list">
-          <div
-            v-for="msg in messages"
-            :key="msg.id"
-            class="message"
-            :class="{ me: msg.isMe }"
-          >
+          <div v-for="msg in messages" :key="msg.id" class="message" :class="{ me: msg.isMe }">
             <div class="message-box">
               <div v-if="!msg.isMe" class="username">{{ msg.user }}</div>
               <div class="bubble" :class="{ me: msg.isMe }">
@@ -113,54 +93,39 @@
   </div>
 </template>
 
-<script setup lang = "ts">
+<script setup lang="ts">
+import { state } from '@/store/userStore.ts'
+import {
+  useOnlineUsersWebSocket,
+  type WebSocketOnlineUsers,
+} from '@/composable/UseOnlineUsersWebSocket.ts'
+import type { OnlineUserInfo } from '@/types/index.ts'
+import { ref } from 'vue'
 
-onMounted(() => {
+const userId: string | undefined = state.userInfo!.userId
 
+const onlineUsers = ref<OnlineUserInfo[]>([])
+
+const {
+  isConnected,
+  lastMessage,
+  disconnect,
+  error,
+} = useOnlineUsersWebSocket({
+  userId,
+  onMessage: (msg) => console.log(`${userId}: ${msg.onlineUsers}`),
+  onConnect: () => console.log('온라인 유저 연결 완료'),
+  onDisconnect: () => console.log('온라인 유저 소켓 해제'),
+  onError: (error) => console.err(error),
 })
 
-import { ref, computed, onMounted } from 'vue'
-import { Send, User, MessageCircle } from 'lucide-vue-next'
+onlineUsers.value = lastMessage.value
 
-const selectedRoom = ref(null)
-const message = ref('')
-const searchTerm = ref('')
-
-const onlineUsers = [
-  { id: 1, name: '김철수', status: 'online', avatar: 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png' },
-  { id: 2, name: '이영희', status: 'online', avatar: 'https://cube.elemecdn.com/0/88/31c369606ad6f8e321b2bff7c3b8epng.png' },
-  { id: 3, name: '박민수', status: 'away', avatar: 'https://cube.elemecdn.com/9/6e/3bfaed7b07b50e46d60b6a6cce3bepng.png' },
-]
-
-const chatRooms = [
-  { id: 1, name: '일반 채팅', unread: 3 },
-  { id: 2, name: '프로젝트 팀', unread: 0 },
-  { id: 3, name: '스터디 그룹', unread: 1 },
-  { id: 4, name: '친구들', unread: 7 },
-]
-
-const filteredRooms = computed(() => {
-  const term = searchTerm.value.trim().toLowerCase()
-  if (!term) return chatRooms
-  return chatRooms.filter(r => r.name.toLowerCase().includes(term))
-})
-
-const messages = ref([
-  { id: 1, user: '김철수', content: '안녕하세요! dfs dsfsdfsdfsdfddddddddddddddddsdfsdfdsdffffsdfsdaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', time: '10:30' },
-  { id: 2, user: '나', content: '안녕하세요! 반갑습니다.', time: '10:31', isMe: true },
-])
-
-const sendMessage = () => {
-  if (!message.value.trim()) return
-  messages.value.push({
-    id: messages.value.length + 1,
-    user: '나',
-    content: message.value,
-    time: new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' }),
-    isMe: true,
-  })
-  message.value = ''
-}
+/*
+ * 1.로그인 유저 웹소켓 연결
+ * 2. 받아서 보여주면 됨
+ * 3.
+ * */
 </script>
 
 <style scoped>
@@ -361,11 +326,11 @@ const sendMessage = () => {
   padding: 10px 14px;
   border-radius: 12px;
   max-width: 150%; /* 메시지 버블 최대 너비 */
-  word-wrap: break-word;       /* 오래된 브라우저 호환용 */
-  overflow-wrap: break-word;   /* 최신 브라우저에서 긴 문자열 끊기 */
-  word-break: break-word;      /* 긴 단어 강제 줄바꿈 */
-  white-space: pre-wrap;       /* 줄바꿈 문자(\n)는 유지 */
-  box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+  word-wrap: break-word; /* 오래된 브라우저 호환용 */
+  overflow-wrap: break-word; /* 최신 브라우저에서 긴 문자열 끊기 */
+  word-break: break-word; /* 긴 단어 강제 줄바꿈 */
+  white-space: pre-wrap; /* 줄바꿈 문자(\n)는 유지 */
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
   transition: all 0.2s ease;
   text-align: left; /* ✅ 줄바꿈 기준을 왼쪽으로 */
 }

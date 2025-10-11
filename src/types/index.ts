@@ -5,3 +5,9 @@ export type UserInfo = {
   profileImage: string
 }
 
+export type OnlineUserInfo = {
+  userId: string
+  nickname: string
+  profileImage: string
+}
+
