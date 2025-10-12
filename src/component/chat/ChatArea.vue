@@ -1,14 +1,19 @@
 <template>
+  <Header/>
   <div class="chat-app">
-    <!-- 왼쪽 사이드바 -->
-    <OnlineUsers :onlineUsers/>
 
-      채팅방 리스트
-      <!-- <div class="room-list">
+    <!--  <h1>Just Chatting</h1>-->
+    <!-- 왼쪽 사이드바 -->
+    <div class="sidebar">
+      <OnlineUsersList :onlineUsers />
+    </div>
+
+    채팅방 리스트
+    <!-- <div class="room-list">
         <h2><MessageCircle class="icon" /> 채팅방</h2> -->
 
-      🔍 검색창
-       <!-- <el-input
+    🔍 검색창
+    <!-- <el-input
           v-model="searchTerm"
           placeholder="채팅방 검색..."
           prefix-icon="Search"
@@ -16,7 +21,7 @@
           class="mb-3"
         /> -->
 
-        <!-- <template v-if="filteredRooms.length > 0">
+    <!-- <template v-if="filteredRooms.length > 0">
           <div
             v-for="room in filteredRooms"
             :key="room.id"
@@ -33,17 +38,17 @@
           <p class="no-result">검색 결과가 없습니다 😢</p>
         </template>
       </div> -->
-    </div>
+    <!--    </div>-->
 
     <!-- 오른쪽 채팅창 -->
-      <!-- <div class="chat-area">
+    <!-- <div class="chat-area">
       <template v-if="selectedRoom">
         <div class="chat-header">
           <h3>{{ chatRooms.find((r) => r.id === selectedRoom)?.name }}</h3>
         </div> -->
 
-      <!-- 메시지 목록 -->
-      <!-- <el-scrollbar class="message-list">
+    <!-- 메시지 목록 -->
+    <!-- <el-scrollbar class="message-list">
           <div v-for="msg in messages" :key="msg.id" class="message" :class="{ me: msg.isMe }">
             <div class="message-box">
               <div v-if="!msg.isMe" class="username">{{ msg.user }}</div>
@@ -55,8 +60,8 @@
           </div>
         </el-scrollbar>  -->
 
-      <!-- 입력 영역 -->
-      <!-- <div class="input-area">
+    <!-- 입력 영역 -->
+    <!-- <div class="input-area">
           <el-input
             v-model="message"
             placeholder="메시지를 입력하세요..."
@@ -70,7 +75,7 @@
         </div>
       </template>  -->
 
-      <!-- <template v-else>
+    <!-- <template v-else>
         <div class="empty">
           <MessageCircle class="empty-icon" />
           <p>채팅방을 선택해주세요</p>
@@ -85,11 +90,11 @@ import { state } from '@/store/userStore.ts'
 import { useOnlineUsersWebSocket } from '@/composable/UseOnlineUsersWebSocket.ts'
 import type { OnlineUserInfo } from '@/types/index.ts'
 import { ref, watch } from 'vue'
+import OnlineUsersList from '@/component/chat/OnlineUsersList.vue'
+import Header from '@/component/Header.vue'
 
 const userId: string | undefined = state.userInfo!.userId
 const onlineUsers = ref<OnlineUserInfo[] | null>(null)
-
-
 
 const { isConnected, lastMessage, disconnect, error } = useOnlineUsersWebSocket({
   userId,
@@ -118,56 +123,19 @@ watch(lastMessage, (newOnlineUsers) => {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
 }
 
+.sidebar {
+  width: 320px;
+  background: white;
+  border-right: 1px solid #e0e0e0;
+  display: flex;
+  flex-direction: column;
+}
+
 .scroll-area {
   max-height: 160px;
   overflow-y: auto;
 }
-.user-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 8px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-.user-item:hover {
-  background: #f5f7fa;
-}
-.avatar {
-  position: relative;
-}
 
-.avatar-circle {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-weight: 600;
-  border: 2px solid #e0e0e0;
-}
-
-.status {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  border: 2px solid white;
-}
-
-.status.online {
-  background: #67c23a;
-}
-
-.status.away {
-  background: #e6a23c;
-}
 .user-item span {
   font-size: 14px;
   color: #606266;

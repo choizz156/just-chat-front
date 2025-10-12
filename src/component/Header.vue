@@ -5,7 +5,7 @@
         Just Chatting
         <el-dropdown trigger="click" @command="handleCommand">
           <div class="flex items-center cursor-pointer hover:opacity-80 transition-opacity">
-            <el-avatar :size="40" :src=userProfile.avatar class="border-2 border-gray-200" />
+            <el-avatar :size="40" :src="userProfile.avatar" class="border-2 border-gray-200" />
             <span class="text-sm font-semibold text-gray-900 ml-4">{{ userProfile.nickname }}</span>
             <el-icon class="text-gray-400 ml-2">
               <arrow-down />
@@ -34,13 +34,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { reactive, ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import { ArrowDown, User, Setting, SwitchButton } from '@element-plus/icons-vue'
 import { state } from '@/store/userStore.ts'
 
 // 사용자 프로필 정보
-const userProfile = ref({
+const userProfile = reactive({
   nickname: state.userInfo?.nickname,
   avatar: state.userInfo?.profileImage,
 })
@@ -71,6 +71,11 @@ const handleLogout = () => {
   // router.push('/login')
 }
 </script>
+<style>
+* {
+  user-select: none;
+}
+</style>
 
 <style scoped>
 .el-dropdown-menu__item {
