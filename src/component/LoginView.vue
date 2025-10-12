@@ -74,8 +74,8 @@ const handleLogin = async () => {
       try {
         const res = await login(loginForm.username, loginForm.password)
 
-        ElMessage.success('로그인 성공!')
         storeUserInfo(res.data.result)
+        ElMessage.success('로그인 성공!')
         await router.push('/chatting')
       } catch (error: any) {
         console.error(error.message)
@@ -90,7 +90,9 @@ const handleLogin = async () => {
 
 const { setUserInfo } = useUserStore()
 function storeUserInfo(data: any) {
-  const imageUrl: string = toImageUrl(data.profileImage)
+  const imageUrl: string = data.profileImage
+    ? data.profileImage
+    : `https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png`
 
   const userInfo: UserInfo = {
     userId: data.userId,
@@ -99,18 +101,6 @@ function storeUserInfo(data: any) {
     profileImage: imageUrl,
   }
   setUserInfo(userInfo)
-}
-
-function toImageUrl(image: string): string {
-  if (!image) {
-    return `https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png`
-  }
-
-  const bytesChar = atob(image)
-  const byteNum = new Array(bytesChar.length).fill(0).map((_, i) => bytesChar.charCodeAt(i))
-  const uint8Array = new Uint8Array(byteNum)
-  const blob = new Blob([uint8Array], { type: 'image/jpeg' })
-  return URL.createObjectURL(blob)
 }
 
 const handleGoToJoin = () => {
