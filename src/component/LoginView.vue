@@ -41,9 +41,9 @@ import { reactive, ref } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import { ElMessage } from 'element-plus'
 import router from '@/router'
-import axios from 'axios'
 import { useUserStore } from '@/store/userStore.ts'
 import type { UserInfo } from '@/types/index.ts'
+import { login } from '@/api/api.ts'
 
 const loginFormRef = ref<FormInstance>()
 const loading = ref(false)
@@ -72,16 +72,10 @@ const handleLogin = async () => {
       loading.value = true
 
       try {
-        const res = await axios.post(
-          'http://localhost:8080/auth/login',
-          {
-            username: loginForm.username,
-            password: loginForm.password,
-          },
-          { withCredentials: true },
-        )
+        const res = await login(loginForm.username, loginForm.password)
+
         ElMessage.success('로그인 성공!')
-        await storeUserInfo(res.data.result)
+        storeUserInfo(res.data.result)
         await router.push('/chatting')
       } catch (error: any) {
         console.error(error.message)

@@ -1,20 +1,7 @@
 <template>
   <div class="chat-app">
     <!-- 왼쪽 사이드바 -->
-    <div class="sidebar">
-      <!-- 유저 리스트 -->
-      <div class="user-list">
-        <h2><User class="icon" /> 온라인 유저</h2>
-        <el-scrollbar height="180px">
-          <div v-for="user in onlineUsers" :key="user.id" class="user-item">
-            <div class="avatar">
-              <el-avatar :size="40" :src="user.profileImage" class="border-2 border-gray-200" />
-              <!-- <div class="status" :class="user.status === 'online' ? 'online' : 'away'"></div> -->
-            </div>
-            <span>{{ user.nickname }}</span>
-          </div>
-        </el-scrollbar>
-      </div>
+    <OnlineUsers :onlineUsers/>
 
       채팅방 리스트
       <!-- <div class="room-list">
@@ -102,6 +89,8 @@ import { ref, watch } from 'vue'
 const userId: string | undefined = state.userInfo!.userId
 const onlineUsers = ref<OnlineUserInfo[] | null>(null)
 
+
+
 const { isConnected, lastMessage, disconnect, error } = useOnlineUsersWebSocket({
   userId,
   onMessage: () => console.log('메시지 수신'),
@@ -128,30 +117,7 @@ watch(lastMessage, (newOnlineUsers) => {
   background: #f5f5f5;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
 }
-.sidebar {
-  width: 320px;
-  background: white;
-  border-right: 1px solid #e0e0e0;
-  display: flex;
-  flex-direction: column;
-}
-.user-list {
-  padding: 20px;
-  border-bottom: 1px solid #e0e0e0;
-}
-.user-list h2 {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 18px;
-  color: #333;
-  margin-bottom: 12px;
-}
-.user-list h2 .icon {
-  width: 20px;
-  height: 20px;
-  color: #409eff;
-}
+
 .scroll-area {
   max-height: 160px;
   overflow-y: auto;
