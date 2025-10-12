@@ -95,7 +95,7 @@ function storeUserInfo(data: any) {
     : `https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png`
 
   const userInfo: UserInfo = {
-    userId: data.id,
+    id: data.id,
     nickname: data.nickname,
     email: data.email,
     profileImage: imageUrl,

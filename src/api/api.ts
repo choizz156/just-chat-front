@@ -36,10 +36,11 @@ export const createRoom = async (
 ) => {
   console.log(createdBy, hostNickname, clientNickname)
   return await axios.post(
-    `${HOST}/chat-rooms`,
+    `${HOST}/chat-rooms/direct`,
     {
       name: clientNickname,
       description: `${clientNickname}, ${hostNickname}`,
+      clientId: clientId,
       type: 'DIRECT',
       imageUrl: imageUrl,
       maxMembers: 2,

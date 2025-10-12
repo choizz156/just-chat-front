@@ -93,8 +93,8 @@ import { ref, watch } from 'vue'
 import OnlineUsersList from '@/component/chat/OnlineUsersList.vue'
 import Header from '@/component/Header.vue'
 
-const userId: string | undefined = state.userInfo!.userId
-const onlineUsers = ref<OnlineUserInfo[] | null>(null)
+const userId: string | undefined = state.userInfo!.id
+const onlineUsers = ref<OnlineUserInfo[] | undefined | null>(null)
 
 const { isConnected, lastMessage, disconnect, error } = useOnlineUsersWebSocket({
   userId,
@@ -105,8 +105,9 @@ const { isConnected, lastMessage, disconnect, error } = useOnlineUsersWebSocket(
 })
 
 watch(lastMessage, (newOnlineUsers) => {
-  onlineUsers.value = newOnlineUsers
+  onlineUsers.value = newOnlineUsers?.filter(user => user.id !== userId)
 })
+
 </script>
 
 <style scoped>

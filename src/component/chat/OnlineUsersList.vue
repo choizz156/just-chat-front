@@ -16,16 +16,15 @@ function openDialog(user: OnlineUserInfo) {
 }
 
 async function createChatRoom() {
-  console.log(`${selectedUser?.value?.nickname}님과 채팅방 생성!`)
   try{
     const res = await createRoom(
-      state.userInfo!.userId,
+      state.userInfo!.id,
       state.userInfo!.nickname,
       selectedUser.value!.id,
       selectedUser.value!.nickname,
       state.userInfo!.profileImage
     )
-
+    ElMessage.success('채팅방이 생성됐습니다!')
   }catch(err){
     console.error(err)
     const errorMessage = '채팅방 생성에 실패했습니다.'

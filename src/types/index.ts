@@ -1,5 +1,5 @@
 export type UserInfo = {
-  userId: string
+  id: string
   nickname: string
   email: string
   profileImage: string
