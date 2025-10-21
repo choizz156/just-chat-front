@@ -5,7 +5,7 @@ import { createRoom } from'@/api/api.ts'
 import { state } from '@/store/userStore.ts'
 import { ElMessage } from 'element-plus'
 
-defineProps<{ onlineUsers: OnlineUserInfo[] | null }>()
+defineProps<{ onlineUsers: OnlineUserInfo[] | undefined }>()
 
 const dialogVisible = ref(false)
 const selectedUser = ref<OnlineUserInfo | null>(null)
@@ -100,6 +100,18 @@ async function createChatRoom() {
 .user-item:hover {
   background: #f5f7fa;
 }
+
+.scroll-area {
+  max-height: 160px;
+  overflow-y: auto;
+}
+
+.user-item span {
+  font-size: 14px;
+  color: #606266;
+  font-weight: 500;
+}
+
 .avatar {
   position: relative;
 }
