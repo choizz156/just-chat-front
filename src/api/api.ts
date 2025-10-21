@@ -75,7 +75,6 @@ export const makeChatRoom = async (
         createdBy: createdBy,
       }
     }
-
   )
 }
 

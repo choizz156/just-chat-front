@@ -13,11 +13,13 @@ const selectedRoom = ref<string>('')
 const filteredRooms = ref<Room[]>([])
 const description = ref<string>('')
 const imageUrl = ref<string>('')
+const name = ref<string>('')
 const dialogVisible = ref(false)
 
 const setImageUrl = (url: string) => {
   imageUrl.value = url
 }
+
 const filterRoom = (term: string) => {
   if (!props.rooms) {
     filteredRooms.value = []
@@ -35,7 +37,7 @@ const filterRoom = (term: string) => {
 }
 
 const makeRoom = () => {
-  makeChatRoom(state.userInfo?.id, state.userInfo?.nickname, description.value, imageUrl.value)
+  makeChatRoom(state.userInfo.id, name.value, description.value, imageUrl.value)
 }
 
 function openDialog() {
@@ -60,11 +62,11 @@ watch(searchTerm, (newTerm) => {
     <el-dialog v-model="dialogVisible" width="300px" :title="`채팅방을 생성하시겠습니까?`">
       <div>
         채팅방 이름
-        <el-input type="text"></el-input>
+        <el-input v-model="name" type="text"></el-input>
       </div>
       <div>
         설명
-        <el-input type="textarea" maxlength="250" show-word-limit></el-input>
+        <el-input v-model="description" type="textarea" maxlength="250" show-word-limit></el-input>
       </div>
       <Image @ImageLoad="setImageUrl" />
       <template #footer>
