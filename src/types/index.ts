@@ -11,3 +11,8 @@ export type OnlineUserInfo = {
   profileImage: string
 }
 
+export type Room = {
+  id: string
+  name: string
+  profileImage: string
+}

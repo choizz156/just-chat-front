@@ -1,100 +1,97 @@
 <template>
-  <Header/>
+  <Header />
   <div class="chat-app">
-
-    <!--  <h1>Just Chatting</h1>-->
     <!-- 왼쪽 사이드바 -->
     <div class="sidebar">
-      <OnlineUsersList :onlineUsers />
+      <OnlineUsersList :onlineUsers="onlineUsers" />
+      <RoomList :rooms="rooms" />
     </div>
 
-    채팅방 리스트
-    <!-- <div class="room-list">
-        <h2><MessageCircle class="icon" /> 채팅방</h2> -->
+        <div class="chat-area">
+    <!--      <template v-if="selectedRoom">-->
+    <!--        <div class="chat-header">-->
+    <!--          <h3>{{ chatRooms.find((r) => r.id === selectedRoom)?.name }}</h3>-->
+    <!--        </div>-->
 
-    🔍 검색창
-    <!-- <el-input
-          v-model="searchTerm"
-          placeholder="채팅방 검색..."
-          prefix-icon="Search"
-          clearable
-          class="mb-3"
-        /> -->
+    <!--        &lt;!&ndash; 메시지 목록 &ndash;&gt;-->
+    <!--        <el-scrollbar class="message-list">-->
+    <!--          <div v-for="msg in messages" :key="msg.id" class="message" :class="{ me: msg.isMe }">-->
+    <!--            <div class="message-box">-->
+    <!--              <div v-if="!msg.isMe" class="username">{{ msg.user }}</div>-->
+    <!--              <div class="bubble" :class="{ me: msg.isMe }">-->
+    <!--                <p>{{ msg.content }}</p>-->
+    <!--                <span class="time">{{ msg.time }}</span>-->
+    <!--              </div>-->
+    <!--            </div>-->
+    <!--          </div>-->
+    <!--        </el-scrollbar>-->
 
-    <!-- <template v-if="filteredRooms.length > 0">
-          <div
-            v-for="room in filteredRooms"
-            :key="room.id"
-            @click="selectedRoom = room.id"
-            class="room-item"
-            :class="{ active: selectedRoom === room.id }"
-          >
-            <span>{{ room.name }}</span>
-            <el-badge v-if="room.unread > 0" :value="room.unread" type="primary" />
-          </div>
-        </template>
+    <!--        &lt;!&ndash; 입력 영역 &ndash;&gt;-->
+    <!--        <div class="input-area">-->
+    <!--          <el-input-->
+    <!--            v-model="message"-->
+    <!--            placeholder="메시지를 입력하세요..."-->
+    <!--            @keyup.enter="sendMessage"-->
+    <!--            clearable-->
+    <!--          />-->
+    <!--          <el-button type="primary" @click="sendMessage">-->
+    <!--            <Send class="icon" />-->
+    <!--            전송-->
+    <!--          </el-button>-->
+    <!--        </div>-->
+    <!--      </template>-->
 
-        <template v-else>
-          <p class="no-result">검색 결과가 없습니다 😢</p>
-        </template>
-      </div> -->
-    <!--    </div>-->
-
-    <!-- 오른쪽 채팅창 -->
-    <!-- <div class="chat-area">
-      <template v-if="selectedRoom">
-        <div class="chat-header">
-          <h3>{{ chatRooms.find((r) => r.id === selectedRoom)?.name }}</h3>
-        </div> -->
-
-    <!-- 메시지 목록 -->
-    <!-- <el-scrollbar class="message-list">
-          <div v-for="msg in messages" :key="msg.id" class="message" :class="{ me: msg.isMe }">
-            <div class="message-box">
-              <div v-if="!msg.isMe" class="username">{{ msg.user }}</div>
-              <div class="bubble" :class="{ me: msg.isMe }">
-                <p>{{ msg.content }}</p>
-                <span class="time">{{ msg.time }}</span>
-              </div>
-            </div>
-          </div>
-        </el-scrollbar>  -->
-
-    <!-- 입력 영역 -->
-    <!-- <div class="input-area">
-          <el-input
-            v-model="message"
-            placeholder="메시지를 입력하세요..."
-            @keyup.enter="sendMessage"
-            clearable
-          />
-          <el-button type="primary" @click="sendMessage">
-            <Send class="icon" />
-            전송
-          </el-button>
+    <!--      <template v-else>-->
+    <!--        <div class="empty">-->
+    <!--          <MessageCircle class="empty-icon" />-->
+    <!--          <p>채팅방을 선택해주세요</p>-->
+    <!--        </div>-->
+    <!--      </template>-->
         </div>
-      </template>  -->
-
-    <!-- <template v-else>
-        <div class="empty">
-          <MessageCircle class="empty-icon" />
-          <p>채팅방을 선택해주세요</p>
-        </div>
-      </template>
-    </div>-->
   </div>
 </template>
 
 <script setup lang="ts">
 import { state } from '@/store/userStore.ts'
 import { useOnlineUsersWebSocket } from '@/composable/UseOnlineUsersWebSocket.ts'
-import type { OnlineUserInfo } from '@/types/index.ts'
+import type { OnlineUserInfo, Room } from '@/types/index.ts'
 import { ref, watch } from 'vue'
 import OnlineUsersList from '@/component/chat/OnlineUsersList.vue'
 import Header from '@/component/Header.vue'
+import RoomList from '@/component/chat/RoomList.vue'
 
 const userId: string | undefined = state.userInfo!.id
-const onlineUsers = ref<OnlineUserInfo[] | undefined | null>(null)
+const onlineUsers = ref<OnlineUserInfo[] | undefined>(undefined)
+const rooms = ref<Room[] | undefined>(undefined)
+
+
+rooms.value = [
+  {
+    id: '1',
+    name: '일반 채팅방',
+    profileImage: 'https://randomuser.me/api/portraits/men/32.jpg',
+  },
+  {
+    id: '2',
+    name: '팀 프로젝트',
+    profileImage: 'https://randomuser.me/api/portraits/women/45.jpg',
+  },
+  {
+    id: '3',
+    name: '스터디 그룹',
+    profileImage: 'https://randomuser.me/api/portraits/men/66.jpg',
+  },
+  {
+    id: '4',
+    name: '친구들 모임',
+    profileImage: 'https://randomuser.me/api/portraits/women/23.jpg',
+  },
+  {
+    id: '5',
+    name: '게임 채팅방',
+    profileImage: 'https://randomuser.me/api/portraits/men/12.jpg',
+  },
+]
 
 const { isConnected, lastMessage, disconnect, error } = useOnlineUsersWebSocket({
   userId,
@@ -105,9 +102,8 @@ const { isConnected, lastMessage, disconnect, error } = useOnlineUsersWebSocket(
 })
 
 watch(lastMessage, (newOnlineUsers) => {
-  onlineUsers.value = newOnlineUsers?.filter(user => user.id !== userId)
+  onlineUsers.value = newOnlineUsers?.filter((user) => user.id !== userId)
 })
-
 </script>
 
 <style scoped>
@@ -130,98 +126,6 @@ watch(lastMessage, (newOnlineUsers) => {
   border-right: 1px solid #e0e0e0;
   display: flex;
   flex-direction: column;
-}
-
-.scroll-area {
-  max-height: 160px;
-  overflow-y: auto;
-}
-
-.user-item span {
-  font-size: 14px;
-  color: #606266;
-  font-weight: 500;
-}
-
-.room-list {
-  flex: 1;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-}
-
-.room-list h2 {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 18px;
-  color: #333;
-  margin-bottom: 12px;
-}
-
-.room-list h2 .icon {
-  width: 20px;
-  height: 20px;
-  color: #409eff;
-}
-
-.search-box {
-  position: relative;
-  margin-bottom: 12px;
-}
-
-.search-icon {
-  position: absolute;
-  left: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 16px;
-  height: 16px;
-  color: #909399;
-}
-
-.search-box input {
-  width: 100%;
-  padding: 10px 12px 10px 36px;
-  border: 1px solid #dcdfe6;
-  border-radius: 8px;
-  font-size: 14px;
-  outline: none;
-  transition: border-color 0.2s;
-}
-
-.search-box input:focus {
-  border-color: #409eff;
-}
-
-.room-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s;
-  margin-bottom: 4px;
-}
-
-.room-item:hover {
-  background: #f5f7fa;
-}
-
-.room-item.active {
-  background: #ecf5ff;
-  border-left: 4px solid #409eff;
-}
-
-.room-item span {
-  font-size: 14px;
-  color: #606266;
-  font-weight: 500;
-}
-
-.room-item.active span {
-  color: #409eff;
 }
 
 .unread {

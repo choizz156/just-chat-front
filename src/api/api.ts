@@ -34,7 +34,6 @@ export const createRoom = async (
   clientNickname: string,
   imageUrl: string,
 ) => {
-  console.log(createdBy, hostNickname, clientNickname)
   return await axios.post(
     `${HOST}/chat-rooms/direct`,
     {
@@ -53,3 +52,30 @@ export const createRoom = async (
     },
   )
 }
+
+export const findRooms = async () => {
+  return await axios.get(`${HOST}/rooms`)
+}
+
+export const makeChatRoom = async (
+  createdBy: string,
+  name: string,
+  description: string,
+  imageUrl: string | null,
+) => {
+  return await axios.post(`${HOST}/chat-rooms/group`, {
+    name: name,
+    description: description,
+    type: 'GROUP',
+    imageUrl: imageUrl,
+  },
+    {
+      withCredentials: true,
+      params: {
+        createdBy: createdBy,
+      }
+    }
+
+  )
+}
+
