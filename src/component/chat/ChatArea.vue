@@ -4,50 +4,50 @@
     <!-- 왼쪽 사이드바 -->
     <div class="sidebar">
       <OnlineUsersList :onlineUsers="onlineUsers" />
-      <RoomList :rooms="rooms" />
+      <RoomList :rooms="groupRooms"/>
     </div>
 
-        <div class="chat-area">
-    <!--      <template v-if="selectedRoom">-->
-    <!--        <div class="chat-header">-->
-    <!--          <h3>{{ chatRooms.find((r) => r.id === selectedRoom)?.name }}</h3>-->
-    <!--        </div>-->
+    <div class="chat-area">
+      <!--      <template v-if="selectedRoom">-->
+      <!--        <div class="chat-header">-->
+      <!--          <h3>{{ chatRooms.find((r) => r.id === selectedRoom)?.name }}</h3>-->
+      <!--        </div>-->
 
-    <!--        &lt;!&ndash; 메시지 목록 &ndash;&gt;-->
-    <!--        <el-scrollbar class="message-list">-->
-    <!--          <div v-for="msg in messages" :key="msg.id" class="message" :class="{ me: msg.isMe }">-->
-    <!--            <div class="message-box">-->
-    <!--              <div v-if="!msg.isMe" class="username">{{ msg.user }}</div>-->
-    <!--              <div class="bubble" :class="{ me: msg.isMe }">-->
-    <!--                <p>{{ msg.content }}</p>-->
-    <!--                <span class="time">{{ msg.time }}</span>-->
-    <!--              </div>-->
-    <!--            </div>-->
-    <!--          </div>-->
-    <!--        </el-scrollbar>-->
+      <!--        &lt;!&ndash; 메시지 목록 &ndash;&gt;-->
+      <!--        <el-scrollbar class="message-list">-->
+      <!--          <div v-for="msg in messages" :key="msg.id" class="message" :class="{ me: msg.isMe }">-->
+      <!--            <div class="message-box">-->
+      <!--              <div v-if="!msg.isMe" class="username">{{ msg.user }}</div>-->
+      <!--              <div class="bubble" :class="{ me: msg.isMe }">-->
+      <!--                <p>{{ msg.content }}</p>-->
+      <!--                <span class="time">{{ msg.time }}</span>-->
+      <!--              </div>-->
+      <!--            </div>-->
+      <!--          </div>-->
+      <!--        </el-scrollbar>-->
 
-    <!--        &lt;!&ndash; 입력 영역 &ndash;&gt;-->
-    <!--        <div class="input-area">-->
-    <!--          <el-input-->
-    <!--            v-model="message"-->
-    <!--            placeholder="메시지를 입력하세요..."-->
-    <!--            @keyup.enter="sendMessage"-->
-    <!--            clearable-->
-    <!--          />-->
-    <!--          <el-button type="primary" @click="sendMessage">-->
-    <!--            <Send class="icon" />-->
-    <!--            전송-->
-    <!--          </el-button>-->
-    <!--        </div>-->
-    <!--      </template>-->
+      <!--        &lt;!&ndash; 입력 영역 &ndash;&gt;-->
+      <!--        <div class="input-area">-->
+      <!--          <el-input-->
+      <!--            v-model="message"-->
+      <!--            placeholder="메시지를 입력하세요..."-->
+      <!--            @keyup.enter="sendMessage"-->
+      <!--            clearable-->
+      <!--          />-->
+      <!--          <el-button type="primary" @click="sendMessage">-->
+      <!--            <Send class="icon" />-->
+      <!--            전송-->
+      <!--          </el-button>-->
+      <!--        </div>-->
+      <!--      </template>-->
 
-    <!--      <template v-else>-->
-    <!--        <div class="empty">-->
-    <!--          <MessageCircle class="empty-icon" />-->
-    <!--          <p>채팅방을 선택해주세요</p>-->
-    <!--        </div>-->
-    <!--      </template>-->
-        </div>
+      <!--      <template v-else>-->
+      <!--        <div class="empty">-->
+      <!--          <MessageCircle class="empty-icon" />-->
+      <!--          <p>채팅방을 선택해주세요</p>-->
+      <!--        </div>-->
+      <!--      </template>-->
+    </div>
   </div>
 </template>
 
@@ -55,43 +55,16 @@
 import { state } from '@/store/userStore.ts'
 import { useOnlineUsersWebSocket } from '@/composable/UseOnlineUsersWebSocket.ts'
 import type { OnlineUserInfo, Room } from '@/types/index.ts'
-import { ref, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import OnlineUsersList from '@/component/chat/OnlineUsersList.vue'
 import Header from '@/component/Header.vue'
 import RoomList from '@/component/chat/RoomList.vue'
+import { findDirectRooms, findGroupRooms } from '@/api/api.ts'
 
-const userId: string | undefined = state.userInfo!.id
+const userId: string = state.userInfo!.id
 const onlineUsers = ref<OnlineUserInfo[] | undefined>(undefined)
-const rooms = ref<Room[] | undefined>(undefined)
-
-
-rooms.value = [
-  {
-    id: '1',
-    name: '일반 채팅방',
-    profileImage: 'https://randomuser.me/api/portraits/men/32.jpg',
-  },
-  {
-    id: '2',
-    name: '팀 프로젝트',
-    profileImage: 'https://randomuser.me/api/portraits/women/45.jpg',
-  },
-  {
-    id: '3',
-    name: '스터디 그룹',
-    profileImage: 'https://randomuser.me/api/portraits/men/66.jpg',
-  },
-  {
-    id: '4',
-    name: '친구들 모임',
-    profileImage: 'https://randomuser.me/api/portraits/women/23.jpg',
-  },
-  {
-    id: '5',
-    name: '게임 채팅방',
-    profileImage: 'https://randomuser.me/api/portraits/men/12.jpg',
-  },
-]
+const groupRooms = ref<Room[]>([])
+const directRooms = ref<Room[]>([])
 
 const { isConnected, lastMessage, disconnect, error } = useOnlineUsersWebSocket({
   userId,
@@ -104,6 +77,12 @@ const { isConnected, lastMessage, disconnect, error } = useOnlineUsersWebSocket(
 watch(lastMessage, (newOnlineUsers) => {
   onlineUsers.value = newOnlineUsers?.filter((user) => user.id !== userId)
 })
+
+onMounted(async () => {
+  groupRooms.value = await findGroupRooms()
+  directRooms.value = await findDirectRooms(userId)
+})
+
 </script>
 
 <style scoped>

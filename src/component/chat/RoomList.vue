@@ -5,8 +5,9 @@ import { ref, watch } from 'vue'
 import { makeChatRoom } from '@/api/api.ts'
 import { state } from '@/store/userStore.ts'
 import Image from '@/component/Image.vue'
+import { ElMessage } from 'element-plus'
 
-const props = defineProps<{ rooms: Room[] | undefined }>()
+const props = defineProps<{ rooms: Room[] }>()
 
 const searchTerm = ref<string>('')
 const selectedRoom = ref<string>('')
@@ -36,8 +37,33 @@ const filterRoom = (term: string) => {
   })
 }
 
-const makeRoom = () => {
-  makeChatRoom(state.userInfo.id, name.value, description.value, imageUrl.value)
+const makeRoom = async () => {
+  try {
+    const resp = await makeChatRoom(
+      state.userInfo!.id,
+      name.value,
+      description.value,
+      imageUrl.value,
+    )
+
+    const item = resp.data.result
+    const room: Room = {
+      id: item.id,
+      name: item.name,
+      description: item.description,
+      profileImage: item.imageUrl,
+    }
+    ElMessage.success('채팅방이 생성됐습니다!')
+    props.rooms.push(room)
+  } catch (err) {
+    console.error(err)
+    const errorMessage = '채팅방 생성에 실패했습니다.'
+    ElMessage.error(errorMessage)
+  } finally {
+    dialogVisible.value = false
+    name.value = ''
+    description.value=''
+  }
 }
 
 function openDialog() {
@@ -47,6 +73,15 @@ function openDialog() {
 watch(searchTerm, (newTerm) => {
   filterRoom(newTerm)
 })
+
+watch(
+  () => props.rooms,
+  () => {
+    console.log('RoomList: props.rooms 변경 감지됨')
+    filterRoom(searchTerm.value)
+  },
+  { deep: true },
+)
 </script>
 
 <template>

@@ -1,3 +1,4 @@
+import type { Room } from '@/types'
 import axios from 'axios'
 
 const HOST: string = 'http://localhost:8080'
@@ -53,8 +54,29 @@ export const createRoom = async (
   )
 }
 
-export const findRooms = async () => {
-  return await axios.get(`${HOST}/rooms`)
+export const findGroupRooms = async (): Promise<Room[]> => {
+  const res = await axios.get(`${HOST}/rooms/group/all`)
+  return res.data.result.content.map((room: any) => ({
+    id: room.id,
+    name: room.name,
+    description: room.description,
+    profileImage: room.imageUrl
+  }))
+}
+export const findDirectRooms = async (userId: string): Promise<Room[]> => {
+  const res =  await axios.get(`${HOST}/rooms/direct`, {
+    withCredentials: true,
+    params: {
+      userId: userId,
+    },
+  })
+
+  return res.data.result.content.map((room: any) => ({
+    id: room.id,
+    name: room.name,
+    description: room.description,
+    profileImage: room.imageUrl
+  }))
 }
 
 export const makeChatRoom = async (
@@ -63,18 +85,19 @@ export const makeChatRoom = async (
   description: string,
   imageUrl: string | null,
 ) => {
-  return await axios.post(`${HOST}/chat-rooms/group`, {
-    name: name,
-    description: description,
-    type: 'GROUP',
-    imageUrl: imageUrl,
-  },
+  return await axios.post(
+    `${HOST}/chat-rooms/group`,
+    {
+      name: name,
+      description: description,
+      type: 'GROUP',
+      imageUrl: imageUrl,
+    },
     {
       withCredentials: true,
       params: {
         createdBy: createdBy,
-      }
-    }
+      },
+    },
   )
 }
-
