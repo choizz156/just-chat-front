@@ -54,17 +54,22 @@ export const createRoom = async (
   )
 }
 
-export const findGroupRooms = async (): Promise<Room[]> => {
-  const res = await axios.get(`${HOST}/rooms/group/all`)
+export const findGroupRooms = async (userId: string): Promise<Room[]> => {
+  const res = await axios.get(`${HOST}/rooms/group/all`, {
+    withCredentials: true,
+    params: {
+      userId: userId,
+    },
+  })
   return res.data.result.content.map((room: any) => ({
     id: room.id,
     name: room.name,
     description: room.description,
-    profileImage: room.imageUrl
+    profileImage: room.imageUrl,
   }))
 }
 export const findDirectRooms = async (userId: string): Promise<Room[]> => {
-  const res =  await axios.get(`${HOST}/rooms/direct`, {
+  const res = await axios.get(`${HOST}/rooms/direct`, {
     withCredentials: true,
     params: {
       userId: userId,
@@ -75,11 +80,11 @@ export const findDirectRooms = async (userId: string): Promise<Room[]> => {
     id: room.id,
     name: room.name,
     description: room.description,
-    profileImage: room.imageUrl
+    profileImage: room.imageUrl,
   }))
 }
 
-export const makeChatRoom = async (
+export const makeGroupChatRoom = async (
   createdBy: string,
   name: string,
   description: string,

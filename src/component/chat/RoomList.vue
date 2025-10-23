@@ -1,13 +1,16 @@
 <script setup lang="ts">
 import { MessageCircle } from 'lucide-vue-next'
-import { type OnlineUserInfo, type Room } from '@/types/index.ts'
+import { type Room } from '@/types/index.ts'
 import { ref, watch } from 'vue'
-import { makeChatRoom } from '@/api/api.ts'
+import { makeGroupChatRoom } from '@/api/api.ts'
 import { state } from '@/store/userStore.ts'
 import Image from '@/component/Image.vue'
 import { ElMessage } from 'element-plus'
 
-const props = defineProps<{ rooms: Room[] }>()
+const props = defineProps<{
+  groupRooms: Room[]
+  directRooms: Room[]
+}>()
 
 const searchTerm = ref<string>('')
 const selectedRoom = ref<string>('')
@@ -22,7 +25,8 @@ const setImageUrl = (url: string) => {
 }
 
 const filterRoom = (term: string) => {
-  if (!props.rooms) {
+
+  if (!props.groupRooms?.length && !props.directRooms?.length) {
     filteredRooms.value = []
     return
   }
@@ -32,14 +36,22 @@ const filterRoom = (term: string) => {
     return
   }
 
-  filteredRooms.value = props.rooms.filter((room: Room) => {
-    return room.name.toLowerCase().includes(term)
-  })
+  const lowerTerm = term.toLowerCase()
+
+  const groupFiltered = (props.groupRooms || []).filter((room: Room) =>
+    room.name.toLowerCase().includes(lowerTerm),
+  )
+
+  const directFiltered = (props.directRooms || []).filter((room: Room) =>
+    room.name.toLowerCase().includes(lowerTerm),
+  )
+
+  filteredRooms.value = [...groupFiltered, ...directFiltered]
 }
 
 const makeRoom = async () => {
   try {
-    const resp = await makeChatRoom(
+    const resp = await makeGroupChatRoom(
       state.userInfo!.id,
       name.value,
       description.value,
@@ -50,11 +62,12 @@ const makeRoom = async () => {
     const room: Room = {
       id: item.id,
       name: item.name,
+      type: item.type,
       description: item.description,
       profileImage: item.imageUrl,
     }
     ElMessage.success('채팅방이 생성됐습니다!')
-    props.rooms.push(room)
+    props.groupRooms.push(room)
   } catch (err) {
     console.error(err)
     const errorMessage = '채팅방 생성에 실패했습니다.'
@@ -62,7 +75,7 @@ const makeRoom = async () => {
   } finally {
     dialogVisible.value = false
     name.value = ''
-    description.value=''
+    description.value = ''
   }
 }
 
@@ -74,14 +87,14 @@ watch(searchTerm, (newTerm) => {
   filterRoom(newTerm)
 })
 
-watch(
-  () => props.rooms,
-  () => {
-    console.log('RoomList: props.rooms 변경 감지됨')
-    filterRoom(searchTerm.value)
-  },
-  { deep: true },
-)
+// watch(
+//   () => props.rooms,
+//   () => {
+//     console.log('RoomList: props.rooms 변경 감지됨')
+//     filterRoom(searchTerm.value)
+//   },
+//   { deep: true },
+// )
 </script>
 
 <template>
@@ -141,7 +154,20 @@ watch(
 
     <template v-else>
       <div
-        v-for="room in rooms"
+        v-for="groupRoom in groupRooms"
+        :key="groupRoom.id"
+        @click="selectedRoom = groupRoom.id"
+        class="room-item"
+        :class="{ active: selectedRoom === groupRoom.id }"
+      >
+        <div class="flex items-center" style="gap: 8px">
+          <el-avatar :size="40" :src="groupRoom.profileImage" class="border-2 border-gray-200" />
+        </div>
+        <span>{{ groupRoom.name }}</span>
+      </div>
+
+      <div
+        v-for="room in directRooms"
         :key="room.id"
         @click="selectedRoom = room.id"
         class="room-item"

@@ -4,7 +4,7 @@
     <!-- 왼쪽 사이드바 -->
     <div class="sidebar">
       <OnlineUsersList :onlineUsers="onlineUsers" />
-      <RoomList :rooms="groupRooms"/>
+      <RoomList :groupRooms="groupRooms" :directRooms = "directRooms" />
     </div>
 
     <div class="chat-area">
@@ -79,7 +79,7 @@ watch(lastMessage, (newOnlineUsers) => {
 })
 
 onMounted(async () => {
-  groupRooms.value = await findGroupRooms()
+  groupRooms.value = await findGroupRooms(userId)
   directRooms.value = await findDirectRooms(userId)
 })
 

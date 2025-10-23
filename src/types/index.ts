@@ -14,6 +14,7 @@ export type OnlineUserInfo = {
 export type Room = {
   id: string
   name: string
+  type: 'DIRECT' | 'GROUP'
   description: string
   profileImage: string
 }
