@@ -6,11 +6,14 @@ import { makeGroupChatRoom } from '@/api/api.ts'
 import { state } from '@/store/userStore.ts'
 import Image from '@/component/Image.vue'
 import { ElMessage } from 'element-plus'
-
+import type { TabsPaneContext } from 'element-plus'
+import type { ScrollbarDirection } from 'element-plus'
 const props = defineProps<{
   groupRooms: Room[]
-  directRooms: Room[]
+  roomsForMe: Room[]
 }>()
+
+const emit = defineEmits<(e: 'roomCreated', groupRoom: Room) => void>()
 
 const searchTerm = ref<string>('')
 const selectedRoom = ref<string>('')
@@ -18,15 +21,22 @@ const filteredRooms = ref<Room[]>([])
 const description = ref<string>('')
 const imageUrl = ref<string>('')
 const name = ref<string>('')
-const dialogVisible = ref(false)
+const dialogVisible = ref<boolean>(false)
+const activeName = ref<string>('private')
+const scrollSize = ref(30)
+
+const loadMore = (direction: ScrollbarDirection) => {
+  if (direction === 'bottom') {
+    scrollSize.value += 5
+  }
+}
 
 const setImageUrl = (url: string) => {
   imageUrl.value = url
 }
 
 const filterRoom = (term: string) => {
-
-  if (!props.groupRooms?.length && !props.directRooms?.length) {
+  if (!props.groupRooms?.length && !props.roomsForMe?.length) {
     filteredRooms.value = []
     return
   }
@@ -42,7 +52,7 @@ const filterRoom = (term: string) => {
     room.name.toLowerCase().includes(lowerTerm),
   )
 
-  const directFiltered = (props.directRooms || []).filter((room: Room) =>
+  const directFiltered = (props.roomsForMe || []).filter((room: Room) =>
     room.name.toLowerCase().includes(lowerTerm),
   )
 
@@ -67,7 +77,7 @@ const makeRoom = async () => {
       profileImage: item.imageUrl,
     }
     ElMessage.success('채팅방이 생성됐습니다!')
-    props.groupRooms.push(room)
+    emit('roomCreated', room)
   } catch (err) {
     console.error(err)
     const errorMessage = '채팅방 생성에 실패했습니다.'
@@ -79,6 +89,8 @@ const makeRoom = async () => {
   }
 }
 
+const handleClick = () => {}
+
 function openDialog() {
   dialogVisible.value = true
 }
@@ -86,15 +98,6 @@ function openDialog() {
 watch(searchTerm, (newTerm) => {
   filterRoom(newTerm)
 })
-
-// watch(
-//   () => props.rooms,
-//   () => {
-//     console.log('RoomList: props.rooms 변경 감지됨')
-//     filterRoom(searchTerm.value)
-//   },
-//   { deep: true },
-// )
 </script>
 
 <template>
@@ -153,31 +156,44 @@ watch(searchTerm, (newTerm) => {
     </template>
 
     <template v-else>
-      <div
-        v-for="groupRoom in groupRooms"
-        :key="groupRoom.id"
-        @click="selectedRoom = groupRoom.id"
-        class="room-item"
-        :class="{ active: selectedRoom === groupRoom.id }"
-      >
-        <div class="flex items-center" style="gap: 8px">
-          <el-avatar :size="40" :src="groupRoom.profileImage" class="border-2 border-gray-200" />
-        </div>
-        <span>{{ groupRoom.name }}</span>
-      </div>
-
-      <div
-        v-for="room in directRooms"
-        :key="room.id"
-        @click="selectedRoom = room.id"
-        class="room-item"
-        :class="{ active: selectedRoom === room.id }"
-      >
-        <div class="flex items-center" style="gap: 8px">
-          <el-avatar :size="40" :src="room.profileImage" class="border-2 border-gray-200" />
-        </div>
-        <span>{{ room.name }}</span>
-      </div>
+      <el-tabs v-model="activeName" stretch="true" class="demo-tabs" @tab-click="handleClick">
+        <el-tab-pane label="오픈 그룹 채팅" name="first">
+          <el-scrollbar height="800px" @end-reached="loadMore" class="scroll-area">
+            <div
+              v-for="groupRoom in groupRooms"
+              :key="groupRoom.id"
+              @click="selectedRoom = groupRoom.id"
+              class="room-item"
+              :class="{ active: selectedRoom === groupRoom.id }"
+            >
+              <div class="flex items-center" style="gap: 8px">
+                <el-avatar
+                  :size="40"
+                  :src="groupRoom.profileImage"
+                  class="border-2 border-gray-200"
+                />
+              </div>
+              <span>{{ groupRoom.name }}</span>
+            </div>
+          </el-scrollbar>
+        </el-tab-pane>
+        <el-tab-pane label="나의 채팅방" name="second">
+          <el-scrollbar height="800px" @end-reached="loadMore" class="scroll-area">
+            <div
+              v-for="room in roomsForMe"
+              :key="room.id"
+              @click="selectedRoom = room.id"
+              class="room-item"
+              :class="{ active: selectedRoom === room.id }"
+            >
+              <div class="flex items-center" style="gap: 8px">
+                <el-avatar :size="40" :src="room.profileImage" class="border-2 border-gray-200" />
+              </div>
+              <span>{{ room.name }}</span>
+            </div>
+          </el-scrollbar>
+        </el-tab-pane>
+      </el-tabs>
     </template>
   </div>
 </template>
@@ -274,5 +290,17 @@ watch(searchTerm, (newTerm) => {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+.demo-tabs > .el-tabs__content {
+  padding: 30px;
+  color: #6b778c;
+  font-size: 32px;
+  font-weight: 600;
+}
+
+.scroll-area {
+  max-height: 500px;
+  overflow-y: auto;
 }
 </style>

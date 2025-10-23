@@ -68,8 +68,8 @@ export const findGroupRooms = async (userId: string): Promise<Room[]> => {
     profileImage: room.imageUrl,
   }))
 }
-export const findDirectRooms = async (userId: string): Promise<Room[]> => {
-  const res = await axios.get(`${HOST}/rooms/direct`, {
+export const findRoomsContaingMe = async (userId: string): Promise<Room[]> => {
+  const res = await axios.get(`${HOST}/rooms`, {
     withCredentials: true,
     params: {
       userId: userId,

@@ -4,7 +4,7 @@
     <!-- 왼쪽 사이드바 -->
     <div class="sidebar">
       <OnlineUsersList :onlineUsers="onlineUsers" />
-      <RoomList :groupRooms="groupRooms" :directRooms = "directRooms" />
+      <RoomList :groupRooms="groupRoomsExceptMe" :roomsForMe = "roomsForMe" @roomCreated="addRoom" />
     </div>
 
     <div class="chat-area">
@@ -59,13 +59,18 @@ import { onMounted, ref, watch } from 'vue'
 import OnlineUsersList from '@/component/chat/OnlineUsersList.vue'
 import Header from '@/component/Header.vue'
 import RoomList from '@/component/chat/RoomList.vue'
-import { findDirectRooms, findGroupRooms } from '@/api/api.ts'
+import { findRoomsContaingMe, findGroupRooms } from '@/api/api.ts'
 
 const userId: string = state.userInfo!.id
 const onlineUsers = ref<OnlineUserInfo[] | undefined>(undefined)
-const groupRooms = ref<Room[]>([])
-const directRooms = ref<Room[]>([])
+const groupRoomsExceptMe = ref<Room[]>([])
+const roomsForMe = ref<Room[]>([])
+const roomsContainingMe = ref<Room[]>([])
 
+
+const addRoom = (room: Room) => {
+  roomsContainingMe.value.push(room)
+}
 const { isConnected, lastMessage, disconnect, error } = useOnlineUsersWebSocket({
   userId,
   onMessage: () => console.log('메시지 수신'),
@@ -79,8 +84,8 @@ watch(lastMessage, (newOnlineUsers) => {
 })
 
 onMounted(async () => {
-  groupRooms.value = await findGroupRooms(userId)
-  directRooms.value = await findDirectRooms(userId)
+  groupRoomsExceptMe.value = await findGroupRooms(userId)
+  roomsForMe.value = await findRoomsContaingMe(userId)
 })
 
 </script>

@@ -3,12 +3,19 @@ import type { OnlineUserInfo } from '@/types'
 import { ref } from 'vue'
 import { createRoom } from'@/api/api.ts'
 import { state } from '@/store/userStore.ts'
-import { ElMessage } from 'element-plus'
+import { ElMessage, type ScrollbarDirection } from 'element-plus'
 
 defineProps<{ onlineUsers: OnlineUserInfo[] | undefined }>()
 
 const dialogVisible = ref(false)
 const selectedUser = ref<OnlineUserInfo | null>(null)
+const scrollSize = ref(30)
+
+const loadMore = (direction: ScrollbarDirection) => {
+  if (direction === 'bottom') {
+    scrollSize.value += 5
+  }
+}
 
 function openDialog(user: OnlineUserInfo) {
   selectedUser.value = user
@@ -37,8 +44,8 @@ async function createChatRoom() {
 
 <template>
   <div class="user-list">
-    <h2>온라인 유저</h2>
-    <el-scrollbar height="180px">
+  <h2>온라인 유저</h2>
+   <el-scrollbar height="200px" @end-reached="loadMore" class="scroll-area">
       <div
         v-for="user in onlineUsers"
         :key="user.id"
